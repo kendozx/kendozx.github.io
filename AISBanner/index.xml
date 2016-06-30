@@ -1,0 +1,10 @@
+<Module specificationVersion='2'>
+  <ModulePrefs title="AISBanner">
+    <Require feature="dynamic-height"/>
+    <Require feature="osapi"/>
+    <Locale lang="all">
+      <msg name="title">AIS Banner</msg>
+    </Locale>
+  </ModulePrefs>
+  <Content type="html" href="index.html"/>
+</Module>
