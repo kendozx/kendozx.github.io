@@ -1,0 +1,18 @@
+<mvc:View 
+	controllerName="zem.sapui5.training.controller.EmpDetail"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc">
+	<Page title="{i18n>mainPageTitle}"
+		showNavButton="true"
+		navButtonPress="onPressBack">
+		<content>
+			<ObjectHeader title="{employee>FirstName} {employee>LastName}"
+				number="{employee>Pernr}"
+				numberState="{= ${employee>Active} === true ? 'Success' : 'Error' }" >
+				<attributes>
+					<ObjectAttribute text="{employee>Birthday}" />
+				</attributes>
+			</ObjectHeader>
+		</content>
+	</Page>
+</mvc:View>

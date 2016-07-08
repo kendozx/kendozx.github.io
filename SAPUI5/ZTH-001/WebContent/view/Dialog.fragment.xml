@@ -1,0 +1,16 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<Dialog icon="sap-icon://sap-ui5" title="{i18n>mainPageTitle}"
+		resizable="true" draggable="true">
+		<content>
+			<core:Icon src="sap-icon://hello-world"
+				size="8rem"
+				class="sapUiMediumMargin" />
+			<Text text="{/employee/name}" />
+		</content>
+		<endButton>
+			<Button text="{i18n>dialogCloseButtonText}" press="onPressCloseDialog" />
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>

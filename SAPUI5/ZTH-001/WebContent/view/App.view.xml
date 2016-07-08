@@ -1,0 +1,7 @@
+<mvc:View 
+	controllerName="zem.sapui5.training.controller.App"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	displayBlock="true">
+	<App id="app" class="zemApp" />
+</mvc:View>

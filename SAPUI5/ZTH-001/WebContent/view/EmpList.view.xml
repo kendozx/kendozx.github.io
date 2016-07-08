@@ -1,0 +1,59 @@
+<mvc:View controllerName="zem.sapui5.training.controller.EmpList"
+	xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc">
+	<Table items="{employee>/results}" width="auto" class="sapUiResponsiveMargin">
+		<columns>
+			<Column>
+				<Text text="{i18n>headerPernr}" />
+			</Column>
+			<Column>
+				<Text text="{i18n>headerFname}" />
+			</Column>
+			<Column>
+				<Text text="{i18n>headerLname}" />
+			</Column>
+			<Column>
+				<Text text="{i18n>headerActive}" />
+			</Column>
+			<Column>
+				<Text text="{i18n>headerBdate}" />
+			</Column>
+			<Column hAlign="Right">
+				<Text text="{i18n>headerBudget}" />
+			</Column>
+			<!-- <ObjectListItem title="{employee>Pernr}" number="{employee>Budget}" 
+				numberUnit="Bath" intro="{employee>FirstName} {employee>LastName}"> <attributes> 
+				<ObjectAttribute text="{employee>Birthday}" /> </attributes> </ObjectListItem> -->
+		</columns>
+		<items>
+			<ColumnListItem  type="Navigation" press="onSelectList">
+				<cells>
+					<ObjectIdentifier title="{employee>Pernr}" />
+				</cells>
+				<cells>
+					<Text text="{employee>FirstName}" />
+				</cells>
+				<cells>
+					<Text text="{employee>LastName}" />
+				</cells>
+				<cells>
+					<ObjectStatus text="{employee>Active}"
+						state="{ parts: ['employee>Active'], formatter: '.formatter.setState' }"
+						icon="{ parts: ['employee>Active'], formatter: '.formatter.setIcon' }" />
+				</cells>
+				<cells>
+					<Text text="{employee>Birthday}" />
+				</cells>
+				<cells>
+					<ObjectNumber
+							number="{
+								parts:['employee>Budget'],
+								type: 'sap.ui.model.type.Currency',
+								formatOptions: {showMeasure: false}
+							}"
+							unit="" />
+				</cells>
+
+			</ColumnListItem>
+		</items>
+	</Table>
+</mvc:View>
