@@ -1,5 +1,6 @@
 <Module specificationVersion='2'>
   <ModulePrefs title="AISBanner" height="360" >
+    <Icon>http://www.ais.co.th/base_interface/images/ais_menu_logo.png</Icon>
     <Require feature="dynamic-height"/>
     <Require feature="osapi"/>
     <Locale lang="all">
