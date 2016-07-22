@@ -2,10 +2,10 @@
   <ModulePrefs title="SAP Jam Banner" height="360" 
   author="Emeritis Thailand" 
     author_email="dev@emeritis.com" 
-    description="HTML Banner for SAP Jam" >
+    description="HTML Banner for SAP Jam"
+    thumbnail="banner.png" >
     <Link rel="mediumIcon" href="Home-PNG-File.png"/>
     <Link rel="icon" href="Home-PNG-File.png"/>
-    <Link rel="placeholder" href="banner.png"/>
     <Require feature="dynamic-height"/>
     <Require feature="osapi"/>
     <Locale lang="all">
