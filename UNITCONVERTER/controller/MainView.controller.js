@@ -7,29 +7,9 @@ sap.ui.define([
 		
 		onKeyValue: function(oevt){
 			
-//			var oData = this.getView().getModel("screen").getData();
-//			oData.byte = [1234,null];
-//			
-//			this.getView().getModel("screen").refresh();
-//			debugger;
 			var oSource = oevt.getSource();
-//			var dEvtValue = oSource.getValue();
 			this.calculateByte(oSource.getValue(), oSource.data("key"));
 		},
-	
-		onInit: function(){
-			var a = 1000121;
-//			var b = this.getReadableFileSizeString(a);
-
-		},
-		
-//		getReadableFileSizeString: function(bytes) {
-//
-//			var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-//		   if (bytes == 0) return '0 Byte';
-//		   var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
-//		   return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
-//		},
 		
 		calculateByte: function(dByte, sType){
 			var sizes = ['byte', 'kbyte', 'mbyte', 'gbyte']; //, 'tbyte'];
