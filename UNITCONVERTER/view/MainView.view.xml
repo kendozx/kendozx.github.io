@@ -20,12 +20,12 @@
 									formatOptions: {
 										groupingSize: 100,
 										minIntegerDigits: 1,
-										maxFractionDigits: 5,
-										minFractionDigits: 5,
+										maxFractionDigits: 4,
+										minFractionDigits: 4,
 										parseAsString: true,
 										groupingEnabled: true,
 										showMeasure: true,
-												decimalSeparator: '.'
+										decimalSeparator: '.'
 									}}" >
 								<layoutData>
 									<l:GridData span="M8 S8"></l:GridData>
@@ -42,12 +42,12 @@
 									formatOptions: {
 										groupingSize: 100,
 										minIntegerDigits: 1,
-										maxFractionDigits: 5,
-										minFractionDigits: 5,
+										maxFractionDigits: 4,
+										minFractionDigits: 4,
 										parseAsString: true,
 										groupingEnabled: true,
 										showMeasure: true,
-												decimalSeparator: '.'
+										decimalSeparator: '.'
 									}}" >
 								<layoutData>
 									<l:GridData span="M8 S8"></l:GridData>
@@ -64,12 +64,12 @@
 									formatOptions: {
 										groupingSize: 100,
 										minIntegerDigits: 1,
-										maxFractionDigits: 5,
-										minFractionDigits: 5,
+										maxFractionDigits: 4,
+										minFractionDigits: 4,
 										parseAsString: true,
 										groupingEnabled: true,
 										showMeasure: true,
-												decimalSeparator: '.'
+										decimalSeparator: '.'
 									}}" >
 								<layoutData>
 									<l:GridData span="M8 S8"></l:GridData>
@@ -86,12 +86,12 @@
 									formatOptions: {
 										groupingSize: 100,
 										minIntegerDigits: 1,
-										maxFractionDigits: 5,
-										minFractionDigits: 5,
+										maxFractionDigits: 4,
+										minFractionDigits: 4,
 										parseAsString: true,
 										groupingEnabled: true,
 										showMeasure: true,
-												decimalSeparator: '.'
+										decimalSeparator: '.'
 									}}" >
 								
 								<layoutData>
