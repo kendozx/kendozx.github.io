@@ -5,6 +5,7 @@
             //This event is called when the DOM is fully loaded
             window.addEvent("domready",function(){
                 //Creating a new AJAX request that will request 'test.csv' from the current directory
+                jQuery.support.cors = true;
                 var csvRequest = new Request({
                     url:"InternetUsageConverter.xml",
                     onSuccess:function(response){
