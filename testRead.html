@@ -4,18 +4,21 @@
         <script type="text/javascript">
             //This event is called when the DOM is fully loaded
             $(document).ready(function() {
-  $.ajax({
-    type: "GET",
-    url: "test.csv",
-    dataType: "text"
-    success: function(data) {
-      processData(data);
-    }
-  });
+var myusername = $("#username").val();
+$.ajax({
+  type: "GET",
+  url: "serverscript.xxx",
+  data: myusername,
+  cache: false,
+  success: function(data){
+     $("#resultarea").text(data);
+  }
+});
 });
         </script>
     </head>
     <body>
-        <textarea rows="5" cols="25" id="csvResponse"></textarea>
+        <input type="text" name="username" id="username">
+        <div id="resultarea"></div>
     </body>
 </html>
