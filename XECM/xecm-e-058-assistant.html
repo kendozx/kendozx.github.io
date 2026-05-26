@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XECM-E-058 Technical Assistant</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;
+      --text:#e6edf3;--text-muted:#8b949e;--accent:#6e40c9;--accent2:#818cf8;
+      --green:#3fb950;--user-bg:#1f3a6e;--bot-bg:#1c1f26;--code-bg:#0d1117;
+      --red:#f85149;--yellow:#d29922;
+    }
+    html,body{height:100%;overflow:hidden}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+      background:var(--bg);color:var(--text);display:flex;flex-direction:column;align-items:center}
+    .app{width:100%;max-width:900px;display:flex;flex-direction:column;height:100%;
+      border-left:1px solid var(--border);border-right:1px solid var(--border)}
+
+    /* ── HEADER ── */
+    .header{
+      background:var(--surface);border-bottom:1px solid var(--border);
+      padding:10px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0;
+      box-shadow:0 2px 8px rgba(0,0,0,.4)
+    }
+    .avatar{
+      width:42px;height:42px;border-radius:50%;
+      background:linear-gradient(135deg,#6e40c9,#ec4899);
+      display:flex;align-items:center;justify-content:center;
+      font-size:15px;font-weight:700;color:#fff;flex-shrink:0;letter-spacing:-.5px
+    }
+    .hdr-title{font-size:15px;font-weight:600}
+    .hdr-sub{font-size:11px;color:var(--text-muted);margin-top:2px}
+    .hdr-sub span{color:var(--accent2)}
+    .badge{
+      margin-left:auto;background:rgba(63,185,80,.12);color:var(--green);
+      border:1px solid rgba(63,185,80,.3);border-radius:100px;
+      padding:3px 10px;font-size:11px;font-weight:500;
+      display:flex;align-items:center;gap:5px;white-space:nowrap
+    }
+    .badge::before{
+      content:'';width:6px;height:6px;background:var(--green);
+      border-radius:50%;animation:blink 2s infinite
+    }
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+    .hdr-btn{
+      background:var(--accent);color:#fff;border:none;border-radius:8px;
+      padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;
+      display:flex;align-items:center;gap:6px;transition:all .2s;
+      white-space:nowrap;margin-left:8px
+    }
+    .hdr-btn:hover{background:var(--accent2);transform:translateY(-1px)}
+
+    /* ── CHAT ── */
+    .chat{
+      flex:1;overflow-y:auto;padding:18px 20px;
+      display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth
+    }
+    .chat::-webkit-scrollbar{width:5px}
+    .chat::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+    .msg{display:flex;gap:10px;max-width:860px;animation:fadeUp .25s ease}
+    .msg.user{flex-direction:row-reverse;align-self:flex-end}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    .msg-av{
+      width:30px;height:30px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-size:11px;font-weight:700;flex-shrink:0;margin-top:3px
+    }
+    .av-bot{background:linear-gradient(135deg,#6e40c9,#ec4899);color:#fff}
+    .av-user{background:linear-gradient(135deg,#0ea5e9,#6366f1);color:#fff}
+    .bubble{
+      background:var(--bot-bg);border:1px solid var(--border);
+      border-radius:12px;padding:11px 15px;font-size:13.5px;line-height:1.65;
+      max-width:calc(100% - 42px)
+    }
+    .msg.user .bubble{background:var(--user-bg);border-color:rgba(110,64,201,.35)}
+    .bubble h3{font-size:14px;font-weight:600;margin-bottom:8px;color:var(--accent2)}
+    .bubble h4{font-size:13px;font-weight:600;margin:10px 0 5px;color:#a5b4fc}
+    .bubble p{margin-bottom:7px}
+    .bubble p:last-child{margin-bottom:0}
+    .bubble ul,.bubble ol{margin:5px 0 7px 17px}
+    .bubble li{margin-bottom:4px}
+    .bubble code{
+      background:var(--code-bg);border:1px solid var(--border);border-radius:4px;
+      padding:1px 5px;font-family:'Consolas','Cascadia Code',monospace;
+      font-size:12px;color:#f97316
+    }
+    .bubble pre{
+      background:var(--code-bg);border:1px solid var(--border);border-radius:8px;
+      padding:11px 13px;margin:7px 0;overflow-x:auto;
+      font-family:'Consolas','Cascadia Code',monospace;font-size:12px;line-height:1.55
+    }
+    .bubble pre code{background:none;border:none;padding:0;color:var(--text);font-size:12px}
+    .bubble table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+    .bubble th{background:var(--surface2);color:var(--text-muted);padding:7px 9px;
+      text-align:left;border:1px solid var(--border)}
+    .bubble td{padding:7px 9px;border:1px solid var(--border)}
+    .bubble tr:nth-child(even) td{background:rgba(255,255,255,.025)}
+    /* syntax */
+    .kw{color:#c084fc}.str{color:#4ade80}.cmt{color:#4b5563;font-style:italic}
+    .mth{color:#60a5fa}.var{color:#fbbf24}.typ{color:#34d399}
+    /* callouts */
+    .info{
+      background:rgba(110,64,201,.1);border:1px solid rgba(110,64,201,.25);
+      border-left:3px solid var(--accent);border-radius:6px;
+      padding:9px 12px;margin:7px 0;font-size:13px
+    }
+    .warn{
+      background:rgba(210,153,34,.1);border:1px solid rgba(210,153,34,.25);
+      border-left:3px solid var(--yellow);border-radius:6px;
+      padding:9px 12px;margin:7px 0;font-size:13px
+    }
+    .tag{
+      display:inline-block;background:rgba(110,64,201,.18);color:var(--accent2);
+      border:1px solid rgba(110,64,201,.3);border-radius:4px;
+      padding:1px 7px;font-size:11px;font-weight:500
+    }
+    .step{display:flex;gap:10px;margin:6px 0;align-items:flex-start}
+    .snum{
+      width:22px;height:22px;border-radius:50%;background:var(--accent);
+      color:#fff;font-size:11px;font-weight:700;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0
+    }
+
+    /* ── QUICK ACTIONS ── */
+    .qa{
+      display:grid;grid-template-columns:repeat(6,1fr);
+      gap:8px;padding:10px 16px 12px;flex-shrink:0;
+      background:var(--surface);border-top:1px solid var(--border)
+    }
+    .qbtn{
+      background:var(--surface2);border:1px solid var(--border);
+      border-radius:12px;padding:10px 6px 9px;
+      cursor:pointer;transition:all .2s;
+      display:flex;flex-direction:column;align-items:center;gap:5px
+    }
+    .qbtn:hover{
+      background:rgba(110,64,201,.18);border-color:var(--accent);
+      transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.35)
+    }
+    .qico{font-size:20px;line-height:1;display:block}
+    .qlbl{
+      font-size:10px;font-weight:500;color:var(--text-muted);
+      text-align:center;line-height:1.3;display:block
+    }
+    .qbtn:hover .qlbl{color:var(--accent2)}
+
+    /* ── MOBILE: horizontal scroll strip ── */
+    @media(max-width:700px){
+      .badge{display:none}
+      /* wrapper gives the fade-right mask */
+      .qa-wrap{
+        position:relative;flex-shrink:0;
+        background:var(--surface);border-top:1px solid var(--border)
+      }
+      .qa-wrap::after{
+        content:'';pointer-events:none;
+        position:absolute;top:0;right:0;bottom:0;width:36px;
+        background:linear-gradient(to right,transparent,var(--surface));
+        z-index:1
+      }
+      .qa{
+        display:grid;
+        grid-template-rows:repeat(2,auto);
+        grid-auto-flow:column;
+        grid-auto-columns:max-content;
+        overflow-x:auto;gap:6px;
+        padding:8px 36px 8px 12px;
+        scrollbar-width:none;-webkit-overflow-scrolling:touch;
+        background:transparent;border-top:none
+      }
+      .qa::-webkit-scrollbar{display:none}
+      .qbtn{
+        flex-direction:row;flex-shrink:0;
+        border-radius:20px;padding:7px 12px;gap:6px;
+        align-items:center
+      }
+      .qico{font-size:15px}
+      .qlbl{font-size:11px;white-space:nowrap;text-align:left}
+    }
+
+    /* ── INPUT ── */
+    .input-area{
+      border-top:1px solid var(--border);background:var(--surface);
+      padding:12px 18px;display:flex;gap:10px;align-items:flex-end
+    }
+    .input-wrap{
+      flex:1;background:var(--surface2);border:1px solid var(--border);
+      border-radius:11px;display:flex;align-items:center;
+      padding:9px 13px;gap:8px;transition:border-color .2s
+    }
+    .input-wrap:focus-within{border-color:var(--accent)}
+    .chat-in{
+      flex:1;background:none;border:none;outline:none;
+      color:var(--text);font-size:13.5px;resize:none;
+      max-height:110px;line-height:1.5;font-family:inherit
+    }
+    .chat-in::placeholder{color:var(--text-muted)}
+    .send{
+      width:38px;height:38px;border-radius:9px;background:var(--accent);
+      border:none;color:#fff;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      transition:all .2s;flex-shrink:0
+    }
+    .send:hover{background:var(--accent2)}
+    .send:disabled{opacity:.4;cursor:not-allowed}
+
+    /* ── TYPING ── */
+    .typing{display:flex;gap:10px}
+    .typing-dots{
+      background:var(--bot-bg);border:1px solid var(--border);
+      border-radius:12px;padding:13px 17px;
+      display:flex;gap:4px;align-items:center
+    }
+    .typing-dots span{
+      width:7px;height:7px;background:var(--text-muted);
+      border-radius:50%;animation:bounce 1.2s infinite
+    }
+    .typing-dots span:nth-child(2){animation-delay:.2s}
+    .typing-dots span:nth-child(3){animation-delay:.4s}
+    @keyframes bounce{0%,60%,100%{transform:none}30%{transform:translateY(-6px)}}
+
+    /* ── MODAL ── */
+    .overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,.72);
+      backdrop-filter:blur(4px);z-index:200;
+      display:none;align-items:center;justify-content:center;padding:16px
+    }
+    .overlay.on{display:flex}
+    .modal{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:16px;width:100%;max-width:560px;
+      max-height:92vh;overflow-y:auto;
+      animation:mIn .28s ease
+    }
+    @keyframes mIn{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;transform:none}}
+    .modal::-webkit-scrollbar{width:5px}
+    .modal::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+    .modal-hdr{
+      padding:18px 22px 14px;border-bottom:1px solid var(--border);
+      display:flex;align-items:center;justify-content:space-between
+    }
+    .modal-hdr h2{font-size:17px;font-weight:600}
+    .close-btn{
+      width:30px;height:30px;border-radius:7px;background:var(--surface2);
+      border:1px solid var(--border);color:var(--text-muted);
+      cursor:pointer;display:flex;align-items:center;justify-content:center;
+      font-size:15px;transition:all .2s
+    }
+    .close-btn:hover{background:rgba(248,81,73,.12);color:var(--red);border-color:rgba(248,81,73,.3)}
+    .modal-body{padding:18px 22px}
+    .fg{margin-bottom:14px}
+    .fg label{
+      display:block;font-size:11px;font-weight:600;color:var(--text-muted);
+      margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px
+    }
+    .fg input,.fg textarea,.fg select{
+      width:100%;background:var(--surface2);border:1px solid var(--border);
+      border-radius:8px;padding:8px 11px;color:var(--text);
+      font-size:13px;outline:none;transition:border-color .2s;font-family:inherit
+    }
+    .fg input:focus,.fg textarea:focus{border-color:var(--accent)}
+    .fg textarea{resize:vertical;min-height:70px}
+    .tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:5px}
+    .ts{
+      background:var(--surface2);border:1px solid var(--border);
+      border-radius:8px;padding:8px 5px;text-align:center;
+      cursor:pointer;transition:all .2s
+    }
+    .ts:hover{border-color:var(--accent);background:rgba(110,64,201,.1)}
+    .ts.sel{background:rgba(110,64,201,.2);border-color:var(--accent);color:var(--accent2)}
+    .ts-d{font-weight:600;font-size:11px;color:var(--text);margin-bottom:2px}
+    .ts-t{font-size:12px;font-weight:600;color:var(--accent2)}
+    .ts-x{font-size:10px;color:var(--text-muted);margin-top:2px}
+    .modal-ftr{
+      padding:14px 22px 18px;border-top:1px solid var(--border);
+      display:flex;gap:9px;justify-content:flex-end
+    }
+    .btn2{
+      background:var(--surface2);border:1px solid var(--border);
+      color:var(--text-muted);border-radius:8px;
+      padding:8px 15px;font-size:13px;cursor:pointer;transition:all .2s
+    }
+    .btn2:hover{background:var(--surface);color:var(--text)}
+    .btn1{
+      background:var(--accent);border:none;color:#fff;
+      border-radius:8px;padding:8px 18px;font-size:13px;
+      font-weight:500;cursor:pointer;transition:all .2s
+    }
+    .btn1:hover{background:var(--accent2)}
+    .mtg-inline{
+      display:inline-flex;align-items:center;gap:6px;
+      background:var(--accent);color:#fff;border:none;
+      border-radius:8px;padding:8px 16px;font-size:13px;
+      font-weight:500;cursor:pointer;transition:all .2s;margin-top:8px
+    }
+    .mtg-inline:hover{background:var(--accent2)}
+
+
+    /* hide freetext input — button-only navigation */
+    .input-area{display:none}
+
+    /* copy button on code blocks */
+    .pre-wrap{position:relative;display:block}
+    .copy-btn{
+      position:absolute;top:7px;right:7px;
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:5px;color:var(--text-muted);
+      font-size:11px;padding:3px 9px;cursor:pointer;
+      opacity:0;transition:opacity .2s,background .2s,color .2s;
+      font-family:inherit;line-height:1.4
+    }
+    .pre-wrap:hover .copy-btn{opacity:1}
+    .copy-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .copy-btn.done{background:#2ea043;color:#fff;border-color:#2ea043;opacity:1}
+  </style>
+</head>
+<body>
+<div class="app">
+
+<!-- ─── HEADER ─── -->
+<header class="header">
+  <div class="avatar">TH</div>
+  <div>
+    <div class="hdr-title">XECM-E-058 Technical Assistant</div>
+    <div class="hdr-sub">Thanat Hongpanarak · <span>SHANA Project · PTTEP</span></div>
+  </div>
+  <div class="badge">Online</div>
+  <button class="hdr-btn" onclick="openModal()">📅 Schedule Meeting</button>
+</header>
+
+<!-- ─── CHAT ─── -->
+<div class="chat" id="chat"></div>
+
+<!-- ─── QUICK ACTIONS ─── -->
+<div class="qa-wrap">
+<div class="qa" id="qa">
+  <button class="qbtn" onclick="ask('What is XECM-E-058?')">
+    <span class="qico">📋</span><span class="qlbl">Overview</span></button>
+  <button class="qbtn" onclick="ask('Integration steps how to use')">
+    <span class="qico">🔧</span><span class="qlbl">Integration Steps</span></button>
+  <button class="qbtn" onclick="ask('How to upload document xstring')">
+    <span class="qico">📤</span><span class="qlbl">Upload to xECM</span></button>
+  <button class="qbtn" onclick="ask('fetch node id result table output example')">
+    <span class="qico">🔍</span><span class="qlbl">Fetch Node &amp; Output</span></button>
+  <button class="qbtn" onclick="ask('BKPF id format object id')">
+    <span class="qico">🔑</span><span class="qlbl">ID Format</span></button>
+  <button class="qbtn" onclick="ask('Full code example')">
+    <span class="qico">💻</span><span class="qlbl">Code Example</span></button>
+  <button class="qbtn" onclick="ask('All methods list')">
+    <span class="qico">📚</span><span class="qlbl">All Methods</span></button>
+  <button class="qbtn" onclick="ask('Document types docname')">
+    <span class="qico">📄</span><span class="qlbl">Doc Types</span></button>
+  <button class="qbtn" onclick="ask('part 3 manual trigger wrapper program se38')">
+    <span class="qico">⚡</span><span class="qlbl">Manual Trigger</span></button>
+  <button class="qbtn" onclick="ask('Error handling exception')">
+    <span class="qico">⚠️</span><span class="qlbl">Error Handling</span></button>
+  <button class="qbtn" onclick="ask('build xecm url link workspace folder node')">
+    <span class="qico">🔗</span><span class="qlbl">Build xECM URL</span></button>
+  <button class="qbtn" onclick="openModal()">
+    <span class="qico">📅</span><span class="qlbl">Schedule Meeting</span></button>
+</div>
+</div><!-- /.qa-wrap -->
+
+<!-- ─── INPUT (hidden — button navigation only) ─── -->
+<div class="input-area">
+  <div class="input-wrap">
+    <textarea class="chat-in" id="inp" placeholder="Ask anything about XECM-E-058…"
+      rows="1" onkeydown="onKey(event)" oninput="resize(this)"></textarea>
+  </div>
+  <button class="send" id="sendBtn" onclick="send()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+    </svg>
+  </button>
+</div>
+
+</div><!-- /.app -->
+
+<!-- ─── MODAL ─── -->
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2>📅 Schedule a Meeting with Thanat</h2>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg">
+        <label>Topic / Agenda</label>
+        <input id="m-topic" type="text" value="XECM-E-058 Technical Discussion" placeholder="Topic for the meeting">
+      </div>
+      <div class="fg">
+        <label>Notes or Questions</label>
+        <textarea id="m-notes" placeholder="Any specific questions or context…"></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fg" style="margin-bottom:0">
+          <label>Preferred Date</label>
+          <input id="m-date" type="date" min="2026-05-22">
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Preferred Time (ICT UTC+7)</label>
+          <select id="m-time">
+            <option value="">— Select time —</option>
+            <option value="10:00">10:00 – 11:00</option>
+            <option value="11:00">11:00 – 12:00</option>
+            <option value="12:00">12:00 – 13:00</option>
+            <option value="13:00">13:00 – 14:00</option>
+            <option value="14:00">14:00 – 15:00</option>
+            <option value="15:00">15:00 – 16:00</option>
+            <option value="16:00">16:00 – 17:00</option>
+          </select>
+        </div>
+      </div>
+      <div class="warn" style="margin-top:12px;font-size:12px">
+        💬 <strong>Teams link:</strong> Please create a Microsoft Teams meeting manually and share the link in your reply — this form only opens Outlook.
+      </div>
+      <div class="info" style="margin-top:8px;font-size:12px">
+        📩 <strong>To:</strong> thanat.hongpanarak@accenture.com &nbsp;·&nbsp;
+        <strong>CC:</strong> zthanath@pttep.com
+      </div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn2" onclick="closeModal()">Cancel</button>
+      <button class="btn1" onclick="sendMeeting()">✉️ Send Meeting Request</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════
+   KNOWLEDGE BASE
+   ════════════════════════════════════════════ */
+const KB = [
+  {
+    id:'overview',
+    keys:['overview','what is','about','purpose','xecm e 058','xecm-e-058','wricef','description','what does','e-058','e058'],
+    html:`
+<h3>XECM-E-058 — Overview</h3>
+<p>
+  <span class="tag">WRICEF: XECM-E-058</span>&nbsp;
+  <span class="tag">Enhancement (E)</span>&nbsp;
+  <span class="tag">Priority: P1 · Medium</span>&nbsp;
+  <span class="tag">SHANA · PTTEP</span>
+</p>
+<p>This enhancement delivers <strong>two reusable ABAP classes</strong> and <strong>one wrapper program</strong> as a centralized document management interface for the SHANA project, covering both OpenText solutions.</p>
+
+<h4>Part 1 — OpenText ADA (ArchiveLink)</h4>
+<ul>
+  <li>📤 Upload document to ADA (<code>ARCHIV_OBJECT_CREATE</code>)</li>
+  <li>🔗 Update Archive Object &amp; Archive Link (<code>ARCHIV_CONNECTION_INSERT</code>)</li>
+  <li>🔍 Fetch Archive Link Properties (<code>ARCHIV_CONNECTION_READ</code>)</li>
+  <li>📥 Fetch Archive Link URL / Download (<code>ARCHIVOBJECT_GET_URL</code>)</li>
+</ul>
+
+<h4>Part 2 — OpenText xECM (Content Server)</h4>
+<ul>
+  <li>🔐 Authenticate with xECM (OTCSTicket via REST API)</li>
+  <li>📁 Fetch Node ID / workspace tree</li>
+  <li>⚡ Manually trigger workspace creation</li>
+  <li>🏷 Update document category metadata</li>
+  <li>📤 Upload document to xECM</li>
+  <li>📥 Download content from xECM</li>
+  <li>🔎 Search content in xECM</li>
+</ul>
+
+<h4>Part 3 — Manual Workspace Trigger Program</h4>
+<ul>
+  <li>Executable ABAP program (SE38 / GRC-EAM) with ALV output for re-triggering workspaces on demand</li>
+</ul>
+
+<div class="info">
+  💡 <strong>xECM Core pattern:</strong> <strong>TRIGGER_WORKSPACE → FETCH_NODE_ID → UPLOAD / DOWNLOAD</strong><br>
+  Class: <code>ZCL_OPTEM_XECM_SERVICE</code> · Exception: <code>ZCX_OPTEM_COMMON</code> · RFC: <code>OpenText Content Server</code>
+</div>`
+  },
+
+  {
+    id:'steps',
+    keys:['integration','steps','how to use','getting started','quick start','usage','workflow','process','guide'],
+    html:`
+<h3>Integration Steps — 3-Step Pattern</h3>
+<div class="step">
+  <div class="snum">1</div>
+  <div>
+    <strong>TRIGGER_WORKSPACE</strong> — Ensure workspace exists<br>
+    <small style="color:var(--text-muted)">Creates the xECM workspace for the business object if it doesn't exist yet. Safe to call repeatedly.</small>
+    <pre><code><span class="kw">TRY</span>.
+  <span class="var">lo_xecm</span>-><span class="mth">trigger_workspace</span>(
+    iv_object_type = <span class="str">'BKPF'</span>
+    iv_object_id   = <span class="var">lv_obj_id</span> ).
+<span class="kw">CATCH</span> <span class="typ">zcx_optem_common</span>. <span class="cmt">"OK to ignore — workspace may already exist</span>
+<span class="kw">ENDTRY</span>.</code></pre>
+  </div>
+</div>
+<div class="step">
+  <div class="snum">2</div>
+  <div>
+    <strong>FETCH_NODE_ID</strong> — Get all nodes in the workspace<br>
+    <small style="color:var(--text-muted)">Returns a flat table (<code>ZOPTEMTY_NODE_INFO</code>) of all folders and documents.</small>
+    <pre><code><span class="kw">DATA</span>: <span class="var">lt_nodes</span> <span class="kw">TYPE</span> <span class="typ">zoptemty_node_info</span>.
+<span class="var">lo_xecm</span>-><span class="mth">fetch_node_id</span>(
+  <span class="kw">EXPORTING</span>
+    iv_business_objtype = <span class="str">'BKPF'</span>
+    iv_objid            = <span class="var">lv_obj_id</span>
+  <span class="kw">RECEIVING</span>
+    rt_node             = <span class="var">lt_nodes</span> ).
+
+<span class="cmt">"Find the target folder</span>
+<span class="kw">ASSIGN</span> <span class="var">lt_nodes</span>[ node_name = <span class="str">'Supporting Documents'</span> ]
+  <span class="kw">TO FIELD-SYMBOL</span>(<span class="var">&lt;lfw_folder&gt;</span>).
+<span class="var">lv_folder_id</span> = <span class="var">&lt;lfw_folder&gt;</span>-node_id.</code></pre>
+  </div>
+</div>
+<div class="step">
+  <div class="snum">3</div>
+  <div>
+    <strong>UPLOAD_DOCUMENT_XSTRING</strong> — Upload file<br>
+    <pre><code><span class="kw">DATA</span>(<span class="var">lv_node_id</span>) = <span class="var">lo_xecm</span>-><span class="mth">upload_document_xstring</span>(
+  iv_file_name    = <span class="str">'invoice.pdf'</span>
+  iv_display_name = <span class="str">'INV 2025-001'</span>
+  iv_parent_id    = <span class="var">lv_folder_id</span>
+  iv_xstring      = <span class="var">lv_content</span>
+  iv_doc_name     = <span class="str">'D021 Other Supporting Documents'</span> ).</code></pre>
+  </div>
+</div>`
+  },
+
+  {
+    id:'upload',
+    keys:['upload','upload_document','upload document','upload_document_xstring','xstring upload','how to upload','send file','attach'],
+    html:`
+<h3>Upload Document to xECM</h3>
+<h4>Method 1 — UPLOAD_DOCUMENT_XSTRING (Recommended)</h4>
+<p>Best for background jobs, APIs, and server-side programs — no SAP GUI needed.</p>
+<pre><code><span class="kw">DATA</span>(<span class="var">lv_new_node</span>) = <span class="var">lo_xecm</span>-><span class="mth">upload_document_xstring</span>(
+  iv_file_name    = <span class="str">'statement.pdf'</span>        <span class="cmt">"Filename + extension</span>
+  iv_display_name = <span class="str">'Apr-2025 Statement'</span>   <span class="cmt">"Optional; defaults to iv_file_name</span>
+  iv_parent_id    = <span class="var">lv_folder_node_id</span>      <span class="cmt">"Target folder node ID</span>
+  iv_xstring      = <span class="var">lv_pdf_binary</span>          <span class="cmt">"File content as TYPE XSTRING</span>
+  iv_doc_name     = <span class="str">'D021 Other Supporting Documents'</span> ).
+<span class="cmt">"Returns rv_node_id — the new document's xECM node ID</span></code></pre>
+
+<h4>Method 2 — UPLOAD_DOCUMENT (SAP GUI only)</h4>
+<p>Reads file from the user's local PC via <code>GUI_UPLOAD</code>. Not suitable for background.</p>
+<pre><code><span class="kw">DATA</span>(<span class="var">lv_node_id</span>) = <span class="var">lo_xecm</span>-><span class="mth">upload_document</span>(
+  iv_file_path    = <span class="str">'C:\\Temp\\invoice.pdf'</span>
+  iv_display_name = <span class="str">'Invoice April 2025'</span>   <span class="cmt">"Optional</span>
+  iv_parent_id    = <span class="var">lv_folder_node_id</span> ).</code></pre>
+
+<h4>Parameter Reference</h4>
+<table>
+  <tr><th>Parameter</th><th>Required</th><th>Notes</th></tr>
+  <tr><td><code>IV_FILE_NAME</code></td><td>Yes</td><td>Filename with extension — used to determine MIME type</td></tr>
+  <tr><td><code>IV_DISPLAY_NAME</code></td><td>No</td><td>Label shown in xECM UI; defaults to filename</td></tr>
+  <tr><td><code>IV_PARENT_ID</code></td><td>Yes</td><td>Folder node ID from <code>FETCH_NODE_ID</code></td></tr>
+  <tr><td><code>IV_XSTRING</code></td><td>Yes</td><td>Binary content as XSTRING</td></tr>
+  <tr><td><code>IV_DOC_NAME</code></td><td>No</td><td>Document type: <code>D024 Remittance Advice</code></td></tr>
+  <tr><td><code>RV_NODE_ID</code></td><td>—</td><td>Returned: new xECM node ID</td></tr>
+</table>
+<div class="warn">⚠️ Raises <code>ZCX_OPTEM_COMMON</code> with text <code>UPLOAD_FAILED</code> or <code>INVALID_FILE</code>. Always wrap in TRY…CATCH.</div>`
+  },
+
+  {
+    id:'fetchnode',
+    keys:['fetch_node_id','fetch node','fetch node id','get node id','node id method','get nodes','node result','node output','node tree','folder structure','workspace structure','rt_node','result table','node example'],
+    html:`
+<h3>FETCH_NODE_ID — Input, Output &amp; How to Use</h3>
+
+<h4>Step 1 — Call the Method</h4>
+<pre><code><span class="cmt">"Build Object ID first (BKPF = CoCd+DocNo+Year, 18 chars)</span>
+<span class="var">lv_obj_id</span> = |{ <span class="var">iv_bukrs</span> }{ <span class="var">iv_belnr</span> }{ <span class="var">iv_gjahr</span> }|.
+<span class="cmt">"e.g. '100130000000882025'</span>
+
+<span class="kw">DATA</span>: <span class="var">lt_nodes</span> <span class="kw">TYPE</span> <span class="typ">zoptemty_node_info</span>.
+<span class="var">lo_xecm</span>-><span class="mth">fetch_node_id</span>(
+  <span class="kw">EXPORTING</span>
+    iv_business_objtype = <span class="str">'BKPF'</span>
+    iv_objid            = <span class="var">lv_obj_id</span>
+  <span class="kw">RECEIVING</span>
+    rt_node             = <span class="var">lt_nodes</span> ).</code></pre>
+
+<h4>Step 2 — What You Get Back (RT_NODE)</h4>
+<p>Real debugger result for <strong>BKPF · 100130000000882025</strong> (CoCd=1001 / Doc=3000000088 / Year=2025):</p>
+<div style="overflow-x:auto">
+<table style="font-size:11px;min-width:600px">
+  <tr><th>#</th><th>NODE_ID</th><th>NODE_NAME</th><th>TYPE_ID</th><th>TYPE_TEXT</th><th>PARENT_ID</th><th>SIZE</th><th>CNT</th></tr>
+  <tr><td>1</td><td><code>961292</code></td><td>1001-2025-3000000088</td><td style="color:#f97316">848</td><td>Business Workspace</td><td>872490</td><td>5 Items</td><td>X</td></tr>
+  <tr style="background:rgba(255,255,255,.025)"><td>2</td><td><code>961295</code></td><td>Tax Documents</td><td style="color:#60a5fa">0</td><td>Folder</td><td>961292</td><td>0 Items</td><td>X</td></tr>
+  <tr><td>3</td><td><code>961296</code></td><td>Invoice</td><td style="color:#60a5fa">0</td><td>Folder</td><td>961292</td><td>0 Items</td><td>X</td></tr>
+  <tr style="background:rgba(34,197,80,.08);border:1px solid rgba(34,197,80,.25)"><td>4</td><td><code style="color:#22c55e;font-weight:700">961297</code></td><td><strong style="color:#22c55e">Supporting Documents</strong></td><td style="color:#60a5fa">0</td><td>Folder</td><td>961292</td><td>0 Items</td><td>X</td></tr>
+  <tr><td>5</td><td><code>961298</code></td><td>Z1 - Related Sales Order Document</td><td style="color:#8b949e">854</td><td>Related Business Workspaces</td><td>961292</td><td>0 Items</td><td>X</td></tr>
+  <tr style="background:rgba(255,255,255,.025)"><td>6</td><td><code>961299</code></td><td>Z3 - Related FI Document</td><td style="color:#8b949e">854</td><td>Related Business Workspaces</td><td>961292</td><td>0 Items</td><td>X</td></tr>
+</table>
+</div>
+<div class="info" style="margin-top:8px;font-size:12px">
+  <strong>XECM_TYPE_ID legend:</strong>&nbsp;
+  <span style="color:#f97316">848</span> = Business Workspace (root) &nbsp;·&nbsp;
+  <span style="color:#60a5fa">0</span> = Folder &nbsp;·&nbsp;
+  144 = Document &nbsp;·&nbsp;
+  <span style="color:#8b949e">854</span> = Related Workspace (skip — not a real folder)
+</div>
+
+<h4>Step 3 — Identify the Folder &amp; Get NODE_ID</h4>
+<p>Look at <code>NODE_NAME</code> to find which folder to upload into, then read its <code>NODE_ID</code>:</p>
+<pre><code><span class="cmt">"Option A — ASSIGN (will dump if not found without check)</span>
+<span class="kw">ASSIGN</span> <span class="var">lt_nodes</span>[ node_name = <span class="str">'Supporting Documents'</span> ]
+  <span class="kw">TO FIELD-SYMBOL</span>(<span class="var">&lt;lfw_folder&gt;</span>).
+<span class="kw">CHECK</span> sy-subrc = 0.
+<span class="var">lv_parent_id</span> = <span class="var">&lt;lfw_folder&gt;</span>-node_id.  <span class="cmt">"→ '961297'</span>
+
+<span class="cmt">"Option B — VALUE # OPTIONAL (safe, no dump if row missing)</span>
+<span class="kw">DATA</span>(<span class="var">lw_folder</span>) = <span class="kw">VALUE</span> #( <span class="var">lt_nodes</span>[ node_name = <span class="str">'Supporting Documents'</span> ] <span class="kw">OPTIONAL</span> ).
+<span class="kw">IF</span> <span class="var">lw_folder</span>-node_id <span class="kw">IS NOT INITIAL</span>.
+  <span class="var">lv_parent_id</span> = <span class="var">lw_folder</span>-node_id.  <span class="cmt">"→ '961297'</span>
+<span class="kw">ENDIF</span>.</code></pre>
+<p>Then pass <code>lv_parent_id</code> as <code>IV_PARENT_ID</code> to <code>UPLOAD_DOCUMENT_XSTRING</code>.</p>
+
+<h4>Full ZOPTEMTY_NODE_INFO Field Reference</h4>
+<table>
+  <tr><th>Field</th><th>Meaning</th><th>Example</th></tr>
+  <tr><td><code>NODE_ID</code></td><td>xECM unique node ID → use as IV_PARENT_ID</td><td>961297</td></tr>
+  <tr><td><code>NODE_NAME</code></td><td>Display name in xECM</td><td>Supporting Documents</td></tr>
+  <tr><td><code>WORKSPACE_ID</code></td><td>Root workspace name (SAP ID reformatted)</td><td>1001-2025-3000000088</td></tr>
+  <tr><td><code>PARENT_ID</code></td><td>Parent node ID</td><td>961292</td></tr>
+  <tr><td><code>XECM_TYPE_ID</code></td><td>848=WS root, 0=Folder, 144=Doc, 854=Related</td><td>0</td></tr>
+  <tr><td><code>XECM_TYPE_TEXT</code></td><td>Readable type label</td><td>Folder</td></tr>
+  <tr><td><code>CONTAINER</code></td><td>X = is a folder/container</td><td>X</td></tr>
+  <tr><td><code>MIME_TYPE</code></td><td>MIME type (documents only)</td><td>application/pdf</td></tr>
+  <tr><td><code>DOCTYPE</code></td><td>Doc type code</td><td>D021</td></tr>
+  <tr><td><code>DOCTYPE_NAME</code></td><td>Doc type description</td><td>Other Supporting Documents</td></tr>
+  <tr><td><code>NODE_SIZE / NODE_SIZE_FORMATTED</code></td><td>Item count or file size</td><td>5 Items</td></tr>
+</table>`
+  },
+
+  {
+    id:'idformat',
+    keys:['id format','object id','bkpf id','object key','lv_obj_id','objid','id structure','key format','id how'],
+    html:`
+<h3>SAP Object ID Format for xECM</h3>
+<p>Object IDs are concatenated SAP key fields — no separators, no spaces.</p>
+
+<h4>BKPF — FI Document (AR / AP Invoice)</h4>
+<div class="info">
+  <strong>Format:</strong> CompanyCode(4) + DocumentNumber(10) + FiscalYear(4) = <strong>18 chars</strong><br>
+  <strong>Example:</strong> Bukrs=<code>1001</code> / Belnr=<code>3000000088</code> / Gjahr=<code>2025</code><br>
+  → Object ID: <code>100130000000882025</code>
+</div>
+<pre><code><span class="var">lv_xecm_obj_id</span> = |{ <span class="var">iv_bukrs</span> }{ <span class="var">iv_belnr</span> }{ <span class="var">iv_gjahr</span> }|.
+<span class="cmt">"= '100130000000882025'  (18 chars)</span></code></pre>
+
+<h4>ZPAYRQ — Payment Request</h4>
+<div class="info">
+  <strong>Format:</strong> CompanyCode(4) + RequestNumber(10) = <strong>14 chars</strong><br>
+  <strong>Example:</strong> <code>1001</code> + <code>1300000001</code> → <code>10011300000001</code>
+</div>
+
+<h4>BUS2042 — Contract (MM / SD)</h4>
+<div class="info">
+  <strong>Format:</strong> CompanyCode(4) + ContractNumber(13) = <strong>17 chars</strong><br>
+  <strong>Example:</strong> <code>1001</code> + <code>3100000006128</code> → <code>10013100000006128</code>
+</div>
+
+<h4>xECM Display Format (SAP_TO_XECM_ID)</h4>
+<p>When searching/displaying in xECM, IDs are reformatted with dashes:</p>
+<table>
+  <tr><th>Object Type</th><th>xECM Display Format</th></tr>
+  <tr><td><code>BKPF</code></td><td><code>1001-2025-3000000088</code> (CoCode-Year-DocNum)</td></tr>
+  <tr><td><code>ZPAYRQ</code></td><td><code>1001-1300000001</code></td></tr>
+  <tr><td><code>BUS2042</code></td><td><code>1001-3100000006128</code></td></tr>
+</table>`
+  },
+
+  {
+    id:'bizobj',
+    keys:['business object','object type','bkpf','zpayrq','bus2042','supported objects','which objects','what objects'],
+    html:`
+<h3>Supported SAP Business Object Types</h3>
+<table>
+  <tr><th>Object Type</th><th>Description</th><th>ID Length</th><th>Key Structure</th></tr>
+  <tr><td><code>BKPF</code></td><td>FI Document (AR/AP)</td><td>18</td><td>BuKrs(4)+Belnr(10)+Gjahr(4)</td></tr>
+  <tr><td><code>ZPAYRQ</code></td><td>Payment Request</td><td>14</td><td>BuKrs(4)+ReqNo(10)</td></tr>
+  <tr><td><code>BUS2042</code></td><td>Contract (MM/SD)</td><td>17</td><td>BuKrs(4)+ContrNo(13)</td></tr>
+</table>
+<p style="margin-top:8px">Node lookup uses the OpenText BOR API (<code>/otx/rm_wsc_cl_bor_api_factory</code>). To add new object types, extend <code>GET_NODE_ID_BOBJ</code>.</p>
+<div class="info">
+  💡 The <code>IV_BUSINESS_OBJTYPE</code> parameter maps to <code>SWETYPECOU-OBJTYPE</code> (e.g., <code>'BKPF'</code>).
+  For <code>TRIGGER_WORKSPACE</code>, it maps to <code>SWETYPECOU-RECTYPE</code>.
+</div>`
+  },
+
+  {
+    id:'doctype',
+    keys:['document type','doc type','doc name','docname','doctype','d021','d024','supporting document','attachment type','document name','category name'],
+    html:`
+<h3>Document Types (DOC_NAME)</h3>
+<p>Document types identify the category of a file in xECM. Format: <code>DXXX Description</code></p>
+<div class="warn">📋 The valid DOC_NAME list is configured in your xECM environment. Check with your Functional Consultant or refer to the specific FD for the applicable types.</div>
+
+<h4>Known Examples</h4>
+<table>
+  <tr><th>Code</th><th>Description</th></tr>
+  <tr><td><code>D021</code></td><td>Other Supporting Documents</td></tr>
+  <tr><td><code>D024</code></td><td>Remittance Advice</td></tr>
+</table>
+
+<h4>Get Allowed Doc Names for a Folder</h4>
+<pre><code><span class="var">lo_xecm</span>-><span class="mth">get_allowed_docname</span>(
+  <span class="kw">EXPORTING</span>
+    iv_ws_id   = <span class="str">'BKPF_AP'</span>              <span class="cmt">"Workspace Type — NOT a node ID</span>
+    iv_folder  = <span class="str">'Supporting Documents'</span>
+  <span class="kw">IMPORTING</span>
+    et_docname = <span class="var">lt_allowed_docs</span>        <span class="cmt">"TYPE MTY_DOCNAME_MAP_T</span>
+).</code></pre>
+<div class="warn">
+  ⚠️ <strong>IV_WS_ID is a Workspace Type string, NOT a node ID.</strong><br>
+  Examples of valid values: <code>BKPF_AP</code>, <code>BKPF_AR</code><br>
+  The exact workspace type string for your business scenario must be confirmed with your
+  <strong>Functional Consultant</strong> or by referring to the <strong>FD document</strong> for the relevant WRICEF.
+  Using the wrong value will return empty or incorrect allowed doc name results.
+</div>
+
+<h4>Get Doc Type of an Existing Node</h4>
+<pre><code><span class="kw">DATA</span>(<span class="var">lv_docname</span>) = <span class="var">lo_xecm</span>-><span class="mth">get_docname</span>( iv_node_id = <span class="var">lv_node_id</span> ).
+<span class="cmt">"Returns e.g. 'D021 Other Supporting Documents'</span></code></pre>`
+  },
+
+  {
+    id:'methods',
+    keys:['all methods','method list','methods','available methods','api reference','method reference','what methods','complete list'],
+    html:`
+<h3>ZCL_OPTEM_XECM_SERVICE — Complete Method Reference</h3>
+
+<h4>🔐 Authentication &amp; Session</h4>
+<table>
+  <tr><th>Method</th><th>Description</th></tr>
+  <tr><td><code>CONSTRUCTOR</code></td><td>Authenticates; stores OTCSTicket; loads category map</td></tr>
+  <tr><td><code>END_SESSION</code></td><td>Invalidates the session on the server</td></tr>
+</table>
+
+<h4>📁 Workspace</h4>
+<table>
+  <tr><th>Method</th><th>Key Parameters</th><th>Returns</th></tr>
+  <tr><td><code>TRIGGER_WORKSPACE</code></td><td>iv_object_type, iv_object_id</td><td>—</td></tr>
+  <tr><td><code>GET_NODE_ID_BOBJ</code></td><td>iv_business_objtype, iv_objid</td><td>rv_node (STRING)</td></tr>
+</table>
+
+<h4>🔍 Node Navigation</h4>
+<table>
+  <tr><th>Method</th><th>Key Parameters</th><th>Returns</th></tr>
+  <tr><td><code>FETCH_NODE_ID</code></td><td>iv_business_objtype, iv_objid</td><td>rt_node: ZOPTEMTY_NODE_INFO</td></tr>
+  <tr><td><code>GET_NODE_INFO</code></td><td>iv_node_id, iv_id_only, iv_recursive</td><td>ct_node_info (CHANGING)</td></tr>
+  <tr><td><code>GET_NODE_INFO_SINGLE</code></td><td>iv_node_id</td><td>rw_node: MTY_RESP_PROPS</td></tr>
+  <tr><td><code>SEARCH</code></td><td>iv_business_objtype, iv_objid</td><td>ct_node_info (CHANGING)</td></tr>
+</table>
+
+<h4>📤 Document Upload</h4>
+<table>
+  <tr><th>Method</th><th>Notes</th></tr>
+  <tr><td><code>UPLOAD_DOCUMENT_XSTRING</code></td><td>Upload from XSTRING buffer (background-safe)</td></tr>
+  <tr><td><code>UPLOAD_DOCUMENT</code></td><td>Upload from local file path (SAP GUI required)</td></tr>
+</table>
+
+<h4>📥 Document Download</h4>
+<table>
+  <tr><th>Method</th><th>Returns</th></tr>
+  <tr><td><code>DOWNLOAD</code></td><td>ev rv_file: MTY_FILE (info + binary)</td></tr>
+  <tr><td><code>GET_FILE_INFO</code></td><td>rw_version: MTY_RESP_VERS (name, type, MIME)</td></tr>
+  <tr><td><code>DOWNLOAD_LOCAL</code> (static)</td><td>Saves XSTRING to user's local PC via GUI</td></tr>
+</table>
+
+<h4>🏷 Categories &amp; Metadata</h4>
+<table>
+  <tr><th>Method</th><th>Notes</th></tr>
+  <tr><td><code>GET_CAT_MAP</code></td><td>Load category mapping (auto-called in constructor)</td></tr>
+  <tr><td><code>GET_DOCNAME</code></td><td>Get document type name for a node</td></tr>
+  <tr><td><code>GET_ALLOWED_DOCNAME</code></td><td>List allowed doc types for a folder</td></tr>
+  <tr><td><code>UPDATE_CATEGORY</code></td><td>Update metadata categories on a node</td></tr>
+  <tr><td><code>BUILD_JSON_CATEGORY</code> (static)</td><td>Build category JSON payload</td></tr>
+</table>
+
+<h4>🔧 Static Utilities</h4>
+<table>
+  <tr><th>Method</th><th>Notes</th></tr>
+  <tr><td><code>SAP_TO_XECM_ID</code></td><td>Convert SAP key to xECM display format</td></tr>
+  <tr><td><code>UPLOAD_FILE_TO_XSTRING</code></td><td>GUI upload to XSTRING + MIME detection</td></tr>
+  <tr><td><code>DOWNLOAD_LOCAL</code></td><td>XSTRING → local file via GUI download</td></tr>
+</table>`
+  },
+
+  {
+    id:'codeexample',
+    keys:['code example','example','sample code','full example','complete example','implement','code snippet','abap code','how to implement'],
+    html:`
+<h3>Complete ABAP Code Example</h3>
+<p>End-to-end pattern based on <code>ZFNASDM_UPLOAD_DOC_XECM</code>:</p>
+<pre><code><span class="cmt">"── Step 0: Build Object ID ──────────────────────────────</span>
+<span class="kw">DATA</span>(<span class="var">lv_obj_id</span>) = |{ <span class="var">iv_bukrs</span> }{ <span class="var">iv_belnr</span> }{ <span class="var">iv_gjahr</span> }|.
+<span class="cmt">"e.g. '100130000000882025'  (CoCd+DocNo+Year, 18 chars)</span>
+
+<span class="cmt">"── Instantiate — auth happens automatically ─────────────</span>
+<span class="kw">DATA</span>: <span class="var">lo_xecm</span> <span class="kw">TYPE REF TO</span> <span class="typ">zcl_optem_xecm_service</span>.
+<span class="kw">TRY</span>.
+  <span class="var">lo_xecm</span> = <span class="kw">NEW</span> <span class="typ">zcl_optem_xecm_service</span>( ).
+<span class="kw">CATCH</span> <span class="typ">zcx_optem_common</span> <span class="kw">INTO DATA</span>(<span class="var">lo_cx</span>).
+  <span class="kw">RETURN</span>. <span class="cmt">"Auth failed</span>
+<span class="kw">ENDTRY</span>.
+
+<span class="cmt">"── Step 1: Trigger Workspace (create if not yet exists) ─</span>
+<span class="kw">TRY</span>.
+  <span class="var">lo_xecm</span>-><span class="mth">trigger_workspace</span>(
+    iv_object_type = <span class="str">'BKPF'</span>
+    iv_object_id   = <span class="var">lv_obj_id</span> ).
+<span class="kw">CATCH</span> <span class="typ">zcx_optem_common</span>. <span class="cmt">"OK — workspace likely already exists</span>
+<span class="kw">ENDTRY</span>.
+
+<span class="cmt">"── Step 2: Fetch all folders and files in workspace ─────</span>
+<span class="kw">DATA</span>: <span class="var">lt_nodes</span> <span class="kw">TYPE</span> <span class="typ">zoptemty_node_info</span>.
+<span class="kw">TRY</span>.
+  <span class="var">lo_xecm</span>-><span class="mth">fetch_node_id</span>(
+    <span class="kw">EXPORTING</span>
+      iv_business_objtype = <span class="str">'BKPF'</span>
+      iv_objid            = <span class="var">lv_obj_id</span>
+    <span class="kw">RECEIVING</span>
+      rt_node             = <span class="var">lt_nodes</span> ).
+<span class="kw">CATCH</span> <span class="typ">zcx_optem_common</span> <span class="kw">INTO</span> <span class="var">lo_cx</span>.
+  <span class="kw">RETURN</span>.
+<span class="kw">ENDTRY</span>.
+<span class="cmt">"lt_nodes now contains all folders + docs (see Fetch Node tab)</span>
+<span class="cmt">"e.g. row 4: NODE_ID=961297, NODE_NAME='Supporting Documents'</span>
+
+<span class="cmt">"── Identify the target folder from NODE_NAME ────────────</span>
+<span class="kw">DATA</span>(<span class="var">lw_folder</span>) = <span class="kw">VALUE</span> #( <span class="var">lt_nodes</span>[ node_name = <span class="str">'Supporting Documents'</span> ] <span class="kw">OPTIONAL</span> ).
+<span class="kw">CHECK</span> <span class="var">lw_folder</span>-node_id <span class="kw">IS NOT INITIAL</span>.
+
+<span class="cmt">"── Step 3: Upload ───────────────────────────────────────</span>
+<span class="kw">DATA</span>: <span class="var">lv_new_node</span> <span class="kw">TYPE</span> string.
+<span class="kw">TRY</span>.
+  <span class="var">lv_new_node</span> = <span class="var">lo_xecm</span>-><span class="mth">upload_document_xstring</span>(
+    iv_file_name    = <span class="str">'invoice.pdf'</span>         <span class="cmt">"⚠ Must include extension (.pdf/.xlsx etc.)</span>
+    iv_display_name = |INV_{ <span class="var">iv_bukrs</span> }_{ <span class="var">iv_belnr</span> }|  <span class="cmt">"Label shown in xECM</span>
+    iv_parent_id    = <span class="var">lw_folder</span>-node_id     <span class="cmt">"NODE_ID from FETCH_NODE_ID</span>
+    iv_xstring      = <span class="var">lv_pdf_content</span>        <span class="cmt">"File binary as XSTRING</span>
+    iv_doc_name     = <span class="str">'D021 Other Supporting Documents'</span> ).
+                                               <span class="cmt">"⚠ Confirm iv_doc_name with Functional / FD</span>
+  <span class="cmt">"lv_new_node = new xECM Node ID of the uploaded document</span>
+<span class="kw">CATCH</span> <span class="typ">zcx_optem_common</span> <span class="kw">INTO</span> <span class="var">lo_cx</span>.
+  <span class="cmt">"Upload failed — check lo_cx->mv_message</span>
+<span class="kw">ENDTRY</span>.
+
+<span class="cmt">"── End Session ──────────────────────────────────────────</span>
+<span class="var">lo_xecm</span>-><span class="mth">end_session</span>( ).</code></pre>
+
+<h4>⚠️ Important Notes on Upload Parameters</h4>
+<table>
+  <tr><th>Parameter</th><th>Rule</th></tr>
+  <tr style="background:rgba(251,191,36,.07)">
+    <td><code>IV_FILE_NAME</code></td>
+    <td><strong>Must include the file extension</strong> (e.g., <code>.pdf</code>, <code>.xlsx</code>, <code>.tif</code>).
+    The class uses the extension to call <code>SKWF_MIMETYPE_OF_FILE_GET</code> to determine the MIME type.
+    Without an extension the upload will fail or use wrong MIME type.</td>
+  </tr>
+  <tr style="background:rgba(251,191,36,.05)">
+    <td><code>IV_DOC_NAME</code></td>
+    <td>Optional but important. Format: <code>DXXX Description</code> (e.g., <code>D021 Other Supporting Documents</code>).
+    <strong>Confirm the correct value with your Functional Consultant or refer to your FD document.</strong>
+    Wrong/missing value means no document category is assigned in xECM.</td>
+  </tr>
+</table>`
+  },
+
+  {
+    id:'download',
+    keys:['download','get file','retrieve file','download document','download file','get document','read file'],
+    html:`
+<h3>Download Document from xECM</h3>
+
+<h4>DOWNLOAD — Get File Binary + Metadata</h4>
+<pre><code><span class="kw">DATA</span>: <span class="var">lw_file</span> <span class="kw">TYPE</span> <span class="typ">zcl_optem_xecm_service</span>=><span class="typ">mty_file</span>.
+<span class="kw">TRY</span>.
+  <span class="var">lo_xecm</span>-><span class="mth">download</span>(
+    <span class="kw">EXPORTING</span> iv_node_id = <span class="var">lv_node_id</span>
+    <span class="kw">IMPORTING</span> rv_file    = <span class="var">lw_file</span> ).
+<span class="kw">CATCH</span> <span class="typ">zcx_optem_common</span>. <span class="kw">ENDTRY</span>.
+
+<span class="cmt">"lw_file-file            = XSTRING content</span>
+<span class="cmt">"lw_file-info-file_name  = 'invoice.pdf'</span>
+<span class="cmt">"lw_file-info-file_type  = 'pdf'</span>
+<span class="cmt">"lw_file-info-mime_type  = 'application/pdf'</span></code></pre>
+
+<h4>GET_FILE_INFO — Metadata Only (No Download)</h4>
+<pre><code><span class="kw">DATA</span>(<span class="var">lw_info</span>) = <span class="var">lo_xecm</span>-><span class="mth">get_file_info</span>( iv_node_id = <span class="var">lv_node_id</span> ).
+<span class="cmt">"lw_info-file_name, lw_info-file_type, lw_info-mime_type</span></code></pre>
+
+<h4>DOWNLOAD_LOCAL — Save to User's PC</h4>
+<pre><code><span class="typ">zcl_optem_xecm_service</span>=><span class="mth">download_local</span>(
+  iv_path    = <span class="str">'C:\\Temp\\invoice.pdf'</span>
+  iv_xstring = <span class="var">lw_file-file</span> ).
+<span class="cmt">"Uses GUI_DOWNLOAD — requires active SAP GUI session</span></code></pre>
+
+<div class="info">💡 To browse the file in xECM UI: <code>BASE_URL/cs/cs?func=ll&amp;objId=NODE_ID&amp;objAction=browse&amp;viewType=1</code></div>`
+  },
+
+  {
+    id:'constructor',
+    keys:['constructor','authentication','login','otcs ticket','instantiate','create object','new instance','how to create','session start'],
+    html:`
+<h3>Constructor — Authentication</h3>
+<p>Simply instantiate the class. Authentication with OpenText Content Server is handled automatically.</p>
+<pre><code><span class="kw">DATA</span>: <span class="var">lo_xecm</span> <span class="kw">TYPE REF TO</span> <span class="typ">zcl_optem_xecm_service</span>.
+<span class="kw">TRY</span>.
+  <span class="var">lo_xecm</span> = <span class="kw">NEW</span> <span class="typ">zcl_optem_xecm_service</span>( ).
+<span class="kw">CATCH</span> <span class="typ">zcx_optem_common</span> <span class="kw">INTO DATA</span>(<span class="var">lo_cx</span>).
+  <span class="cmt">"Check lo_cx->mv_message for the error detail</span>
+<span class="kw">ENDTRY</span>.</code></pre>
+<p>The constructor does:</p>
+<ol>
+  <li>Calls <code>POST /cs/cs/api/v1/auth</code> with credentials via SM59 RFC destination</li>
+  <li>Stores the returned <code>OTCSTicket</code> in instance attribute <code>MV_OTCS_TICKET</code></li>
+  <li>The ticket is injected into every subsequent HTTP request as header: <code>OTCSTicket: &lt;ticket&gt;</code></li>
+  <li>Calls <code>GET_CAT_MAP</code> to pre-load document category mapping</li>
+</ol>
+<h4>Session Management</h4>
+<pre><code><span class="cmt">"Always end session when finished</span>
+<span class="var">lo_xecm</span>-><span class="mth">end_session</span>( ).  <span class="cmt">"Sends DELETE to /auth endpoint</span></code></pre>
+<div class="info">🔗 SM59 RFC Destination used: <strong>OpenText Content Server</strong></div>`
+  },
+
+  {
+    id:'error',
+    keys:['error','exception','zcx_optem_common','error handling','catch','raise exception','handle error','fail','failure'],
+    html:`
+<h3>Error Handling</h3>
+<p>All public methods raise <code>ZCX_OPTEM_COMMON</code> on error. Always use TRY…CATCH.</p>
+<pre><code><span class="kw">TRY</span>.
+  <span class="kw">DATA</span>(<span class="var">lv_node</span>) = <span class="var">lo_xecm</span>-><span class="mth">upload_document_xstring</span>( ... ).
+<span class="kw">CATCH</span> <span class="typ">zcx_optem_common</span> <span class="kw">INTO DATA</span>(<span class="var">lo_cx</span>).
+  <span class="kw">DATA</span>(<span class="var">lv_msg</span>) = <span class="var">lo_cx</span>->mv_message.
+  <span class="cmt">"Log or display lv_msg</span>
+<span class="kw">ENDTRY</span>.</code></pre>
+
+<h4>Exception Text IDs</h4>
+<table>
+  <tr><th>Text ID</th><th>Trigger</th></tr>
+  <tr><td><code>HTTP_REQUEST_FALED</code></td><td>HTTP call failed or auth error (note: single L — by design)</td></tr>
+  <tr><td><code>HTTP_CLIENT_FALED</code></td><td>Cannot create HTTP client — check SM59 destination</td></tr>
+  <tr><td><code>UPLOAD_FAILED</code></td><td>Upload rejected — check parent_id, permissions, doc type</td></tr>
+  <tr><td><code>INVALID_FILE</code></td><td>File content empty (XSTRING length = 0)</td></tr>
+  <tr><td><code>TRIGGER_WSC_ERROR</code></td><td>Workspace creation failed in <code>ZFNAXECMM_MAIN</code></td></tr>
+</table>
+
+<h4>Common Troubleshooting</h4>
+<ul>
+  <li><strong>401 Unauthorized:</strong> SM59 destination <code>OpenText Content Server</code> credentials issue</li>
+  <li><strong>Node not found:</strong> Run <code>TRIGGER_WORKSPACE</code> first, then retry <code>FETCH_NODE_ID</code></li>
+  <li><strong>Upload fails:</strong> Verify <code>IV_PARENT_ID</code> is a valid writable folder node ID</li>
+  <li><strong>Empty node list:</strong> Workspace may not be created yet for this business object</li>
+</ul>`
+  },
+
+  {
+    id:'constants',
+    keys:['constants','configuration','rfc','destination','sm59','mc_destination','build url','xecm url','link','browse url','open in xecm','node url','url link','url workspace','how to build url','navigate xecm'],
+    html:`
+<h3>🔗 How to Build a Clickable xECM URL</h3>
+<p>You can construct a direct browser link to any xECM workspace, folder, or document using its <code>NODE_ID</code>.</p>
+
+<h4>URL Pattern</h4>
+<div class="info" style="font-size:13px;word-break:break-all">
+  <code>https://<strong>BASE_URL</strong>/cs/cs?func=ll&amp;objId=<strong>NODE_ID</strong>&amp;objAction=browse&amp;viewType=1</code>
+</div>
+
+<h4>Where to Get BASE_URL — Read Programmatically from RFC Destination</h4>
+<p>The host should be read <strong>programmatically</strong> from SM59 RFC Destination <strong>"OpenText Content Server"</strong> using a standard SAP Function Module — do <strong>not</strong> hardcode the URL.</p>
+<div class="warn">
+  ⚠️ <strong>Please identify the appropriate standard SAP FM</strong> in your system to read the host/URL from an RFC destination (e.g., search SE37 for FMs related to RFC destination attributes or HTTP destination reading).<br><br>
+  The RFC destination host is stored in table <code>RFCDES</code> (field <code>RFCHOST</code>) for destination name <code>OpenText Content Server</code>, but always prefer using a <strong>standard FM</strong> over a direct SELECT to ensure correct handling across destination types.
+</div>
+<pre><code><span class="cmt">"Skeleton — replace with the correct standard FM in your system:</span>
+<span class="kw">DATA</span>: <span class="var">lv_host</span> <span class="kw">TYPE</span> string.
+
+<span class="cmt">"Option: direct table read (fallback if no suitable FM found)</span>
+<span class="kw">SELECT SINGLE</span> rfchost
+  <span class="kw">FROM</span> rfcdes
+  <span class="kw">INTO</span> <span class="var">lv_host</span>
+  <span class="kw">WHERE</span> rfcdest = <span class="str">'OpenText Content Server'</span>.
+
+<span class="cmt">"lv_host = e.g. 'otcs.g090-test.opentext.cloud'</span>
+<span class="var">lv_base_url</span> = <span class="var">lv_host</span>.</code></pre>
+<div class="info" style="font-size:12px">
+  💡 The BASE_URL differs per system landscape (DEV / QAS / PRD). Reading it dynamically from the RFC destination ensures your code works correctly in every environment without changes.
+</div>
+
+<h4>Where to Get NODE_ID</h4>
+<p>Use <code>FETCH_NODE_ID</code> to get the node table, then pick the <code>NODE_ID</code> of the folder or workspace you want to browse:</p>
+<pre><code><span class="cmt">"Get target node ID from FETCH_NODE_ID result:</span>
+<span class="kw">DATA</span>(<span class="var">lw_folder</span>) = <span class="kw">VALUE</span> #( <span class="var">lt_nodes</span>[ node_name = <span class="str">'Supporting Documents'</span> ] <span class="kw">OPTIONAL</span> ).
+<span class="var">lv_node_id</span> = <span class="var">lw_folder</span>-node_id.   <span class="cmt">"e.g. '961297'</span>
+
+<span class="cmt">"Build the URL dynamically:</span>
+<span class="var">lv_url</span> = |https://{ <span class="var">lv_base_url</span> }/cs/cs?func=ll&amp;objId={ <span class="var">lv_node_id</span> }&amp;objAction=browse&amp;viewType=1|.</code></pre>
+
+<h4>Real Example (DEV Environment)</h4>
+<table>
+  <tr><th>Part</th><th>Value</th></tr>
+  <tr><td>BASE_URL (from SM59 DEV)</td><td><code>otcs.g090-test.opentext.cloud</code></td></tr>
+  <tr><td>NODE_ID (example)</td><td><code>946947</code></td></tr>
+  <tr><td colspan="2" style="word-break:break-all">
+    ➜ Full URL:<br>
+    <code style="color:#4ade80">https://otcs.g090-test.opentext.cloud/cs/cs?func=ll&amp;objId=946947&amp;objAction=browse&amp;viewType=1</code>
+  </td></tr>
+</table>
+
+<h4>Using Actual Data from Screenshot Example</h4>
+<p>For workspace of BKPF <code>100130000000882025</code>, "Supporting Documents" folder (NODE_ID=961297):</p>
+<div style="background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;word-break:break-all;margin:6px 0">
+  <code style="color:#4ade80">https://otcs.g090-test.opentext.cloud/cs/cs?func=ll&amp;objId=<span style="color:#fbbf24;font-weight:700">961297</span>&amp;objAction=browse&amp;viewType=1</code>
+</div>
+
+<h4>Internal Constants (Class Reference)</h4>
+<table>
+  <tr><th>Constant</th><th>Value</th><th>Purpose</th></tr>
+  <tr><td><code>MC_DESTINATION</code></td><td><code>OpenText Content Server</code></td><td>SM59 destination name for main xECM API</td></tr>
+  <tr><td><code>MC_DESTINATION_DS</code></td><td><code>OpenText Directory Services</code></td><td>SM59 destination for OTDS OAuth</td></tr>
+  <tr><td><code>MC_OPT_NODE</code></td><td><code>872419</code></td><td>OPT root node (used in SEARCH)</td></tr>
+</table>`
+  },
+
+  {
+    id:'trigger',
+    keys:['trigger_workspace','trigger workspace','workspace creation','create workspace','workspace exists'],
+    html:`
+<h3>TRIGGER_WORKSPACE — Create or Verify Workspace</h3>
+<p>Ensures an xECM workspace exists for the SAP business object. If it already exists, this is a no-op.</p>
+<pre><code><span class="kw">TRY</span>.
+  <span class="var">lo_xecm</span>-><span class="mth">trigger_workspace</span>(
+    iv_object_type = <span class="str">'BKPF'</span>       <span class="cmt">"SWETYPECOU-OBJTYPE</span>
+    iv_object_id   = <span class="var">lv_obj_id</span>   <span class="cmt">"SWEINSTCOU-OBJKEY</span>
+  ).
+<span class="kw">CATCH</span> <span class="typ">zcx_optem_common</span>.
+<span class="kw">ENDTRY</span>.</code></pre>
+<div class="info">💡 Internally calls FM <code>ZFNAXECMM_MAIN</code> with the object type and key.</div>
+
+<h4>Recommended Pattern — Try First, Trigger if Empty</h4>
+<pre><code><span class="var">lo_xecm</span>-><span class="mth">fetch_node_id</span>( ... <span class="kw">RECEIVING</span> rt_node = <span class="var">lt_nodes</span> ).
+
+<span class="kw">IF</span> <span class="var">lt_nodes</span> <span class="kw">IS INITIAL</span>.
+  <span class="var">lo_xecm</span>-><span class="mth">trigger_workspace</span>(
+    iv_object_type = <span class="str">'BKPF'</span>
+    iv_object_id   = <span class="var">lv_obj_id</span> ).
+  <span class="var">lo_xecm</span>-><span class="mth">fetch_node_id</span>( ... <span class="kw">RECEIVING</span> rt_node = <span class="var">lt_nodes</span> ).
+<span class="kw">ENDIF</span>.</code></pre>`
+  },
+
+  {
+    id:'updatecat',
+    keys:['update category','update_category','categories','metadata','category update','build_json','json category','cat map'],
+    html:`
+<h3>Update Document Categories (Metadata)</h3>
+
+<h4>UPDATE_CATEGORY</h4>
+<pre><code><span class="kw">DATA</span>(<span class="var">lt_cat</span>) = <span class="kw">VALUE</span> <span class="typ">zcl_optem_xecm_service</span>=><span class="typ">mty_category_t</span>(
+  ( bo_prop = <span class="str">'DocumentDate'</span>  cat_val = <span class="str">'2025-04-01'</span> )
+  ( bo_prop = <span class="str">'CompanyCode'</span>   cat_val = <span class="str">'1001'</span> )
+  ( bo_prop = <span class="str">'Vendor'</span>        cat_val = <span class="str">'100001'</span> ) ).
+
+<span class="kw">TRY</span>.
+  <span class="var">lo_xecm</span>-><span class="mth">update_category</span>(
+    iv_node_id  = <span class="var">lv_node_id</span>
+    it_category = <span class="var">lt_cat</span> ).
+<span class="kw">CATCH</span> <span class="typ">zcx_optem_common</span>. <span class="kw">ENDTRY</span>.</code></pre>
+
+<h4>BUILD_JSON_CATEGORY (Static)</h4>
+<pre><code><span class="kw">DATA</span>(<span class="var">lv_json</span>) = <span class="typ">zcl_optem_xecm_service</span>=><span class="mth">build_json_category</span>(
+  iv_category  = <span class="str">'872804'</span>
+  it_cat_value = <span class="var">lt_cat</span> ).
+<span class="cmt">"Result: {"category_id":"872804","DocumentDate":"2025-04-01",...}</span></code></pre>
+
+<h4>Category Mapping</h4>
+<p>The class holds a pre-loaded category map in <code>MT_CAT_MAPPING</code> (populated in constructor via <code>GET_CAT_MAP</code>). This maps SAP BO property names → xECM region/attribute names.</p>
+<p><code>MTY_CAT_MAP</code> structure: <code>catid, catname, attrname, regionname, bo_prop_name</code></p>`
+  },
+
+  {
+    id:'ada_overview',
+    keys:['ada','opentext ada','archive','archivelink','archive link','upload to ada','ada upload','ada download','archive object','part 1'],
+    html:`
+<h3>ADA (OpenText Archive) — Part 1 Methods</h3>
+<p>Alongside xECM, XECM-E-058 also covers integration with <strong>OpenText ADA</strong> (Archive Document Access / ArchiveLink). Four methods handle ADA document operations.</p>
+
+<h4>Method 1A — Create Archive Object (Upload to ADA)</h4>
+<pre><code><span class="cmt">"Reference FM: ARCHIV_OBJECT_CREATE</span>
+<span class="cmt">"Input:  ARCHIV_ID  – ArchiveLink document type ID</span>
+<span class="cmt">"        OBJECT_ID  – Business object key</span>
+<span class="cmt">"        CONTENT    – Binary content (PDF, TIFF, etc.)</span>
+<span class="cmt">"Output: Archive Link details</span></code></pre>
+
+<h4>Method 1B — Update Archive Object & Archive Link</h4>
+<pre><code><span class="cmt">"Reference FM: ARCHIV_CONNECTION_INSERT</span>
+<span class="cmt">"Input:  OBJECT_ID  – Business object ID</span>
+<span class="cmt">"        ARCHIV_ID  – ArchiveLink document type ID</span>
+<span class="cmt">"        DOC_TYPE   – SAP Archive document type</span>
+<span class="cmt">"        DOC_ID     – Document ID</span>
+<span class="cmt">"Output: Return Code (SY-SUBRC): 0=success, 4/8=error</span></code></pre>
+
+<h4>Method 1C — Fetch Archive Link Properties</h4>
+<pre><code><span class="cmt">"Reference FM: ARCHIV_CONNECTION_READ / ARCHIV_GET_CONNECTIONS</span>
+<span class="cmt">"Input:  OBJECT_ID  – Business object ID</span>
+<span class="cmt">"        DOC_ID     – Document ID</span>
+<span class="cmt">"Output: Archive Link connection details + metadata of linked documents</span></code></pre>
+
+<h4>Method 1D — Fetch Archive Link URL (Download from ADA)</h4>
+<pre><code><span class="cmt">"Reference FM: ARCHIVOBJECT_GET_URL</span>
+<span class="cmt">"Input:  DOC_ID  – Document ID</span>
+<span class="cmt">"Output: Attachment Document URL (string)</span></code></pre>
+
+<div class="info">💡 ADA and xECM are two separate document stores. ADA uses ArchiveLink (SAP standard), while xECM uses the OpenText Content Server REST API. Both are covered by this class.</div>`
+  },
+
+  {
+    id:'nodeexample',
+    keys:['node example','folder structure','workspace structure','node tree','node hierarchy','what does workspace look like','workspace example','folders in xecm'],
+    html:`
+<h3>xECM Workspace Node Tree — Example</h3>
+<p>For an AP accounting document, the xECM workspace structure looks like this:</p>
+<pre><code><span class="cmt">SAP Object ID: 100120251900000001 (BuKrs=1001, Gjahr=2025, Belnr=1900000001)</span>
+<span class="cmt">xECM Root Node: 78392</span>
+
+78392  [ROOT]    100120251900000001     &lt;blank doc type&gt;
+├── 78393  [FOLDER]  Invoice            &lt;blank&gt;       → empty
+├── 78394  [FOLDER]  Tax Documents      &lt;blank&gt;
+│   └── 98329  [DOC]  e-Tax Invoice.pdf  D019  PDF   (100 KB)
+├── 78395  [FOLDER]  Supporting Documents &lt;blank&gt;
+│   ├── 98330  [DOC]  Memo.pdf           D025  PDF   (100 KB)
+│   └── 98331  [DOC]  AP Voucher.pdf     D031  PDF   (100 KB)
+└── 78396  [FOLDER]  Confidential       &lt;blank&gt;       → empty</code></pre>
+
+<h4>How FETCH_NODE_ID Builds This</h4>
+<ol>
+  <li>Gets root node <code>78392</code> via <code>GET_NODE_ID_BOBJ</code></li>
+  <li>Calls <code>GET_NODE_INFO</code> on <code>78392</code> → gets 4 subfolders</li>
+  <li>Recursively calls <code>GET_NODE_INFO</code> on each subfolder (78393–78396)</li>
+  <li>Combines all rows into the flat <code>ZOPTEMTY_NODE_INFO</code> table</li>
+</ol>
+
+<h4>Result Table (ZOPTEMTY_NODE_INFO)</h4>
+<table>
+  <tr><th>WORKSPACE_ID</th><th>NODE_ID</th><th>NODE_NAME</th><th>DOCTYPE</th><th>MIME_TYPE</th><th>PARENT_ID</th></tr>
+  <tr><td>100120251900000001</td><td>78392</td><td>(root)</td><td></td><td></td><td></td></tr>
+  <tr><td>100120251900000001</td><td>78393</td><td>Invoice</td><td></td><td></td><td>78392</td></tr>
+  <tr><td>100120251900000001</td><td>78394</td><td>Tax Documents</td><td></td><td></td><td>78392</td></tr>
+  <tr><td>100120251900000001</td><td>98329</td><td>e-Tax Invoice.pdf</td><td>D019</td><td>PDF</td><td>78394</td></tr>
+  <tr><td>100120251900000001</td><td>78395</td><td>Supporting Documents</td><td></td><td></td><td>78392</td></tr>
+  <tr><td>100120251900000001</td><td>98330</td><td>Memo.pdf</td><td>D025</td><td>PDF</td><td>78395</td></tr>
+  <tr><td>100120251900000001</td><td>98331</td><td>AP Voucher.pdf</td><td>D031</td><td>PDF</td><td>78395</td></tr>
+  <tr><td>100120251900000001</td><td>78396</td><td>Confidential</td><td></td><td></td><td>78392</td></tr>
+</table>`
+  },
+
+  {
+    id:'variants',
+    keys:['variant','variants','zecm_dtyp','dtyp','receipt variant','tax invoice variant','wht variant','doc type variant','constants variant'],
+    html:`
+<h3>Variants — Document Type Groups</h3>
+<p>Three pre-defined variants group xECM document types by category. These are used in the post-upload business logic.</p>
+<table>
+  <tr><th>Variant Name</th><th>Purpose</th><th>Format</th></tr>
+  <tr><td><code>ZECM_DTYP_RECEIPT</code></td><td>xECM Doc Types relevant for Receipt</td><td>Dnnn</td></tr>
+  <tr><td><code>ZECM_DTYP_TAXINV</code></td><td>xECM Doc Types relevant for Tax Invoice</td><td>Dnnn</td></tr>
+  <tr><td><code>ZECM_DTYP_WHT</code></td><td>xECM Doc Types relevant for WHT Certificates</td><td>Dnnn</td></tr>
+</table>
+
+<h4>Post-Upload Logging Logic (Method 2E)</h4>
+<p>After a successful upload to an AP/AR workspace (<code>BKPF</code> with workspace name = "PAYMENT DOCUMENT", "AR INCOMING DOCUMENT", or "AR ACCOUNTING DOCUMENT"), the class checks category flags and logs to <code>ZCROSSECMTnn5</code>:</p>
+<pre><code><span class="cmt">"If uploaded doc type IN variant ZECM_DTYP_RECEIPT</span>
+<span class="cmt">"AND category X_FI_SJT_RECEIPTFLAG = 'YES'</span>
+<span class="cmt">"→ Set ZCROSSECMTnn5-WSC_IND_RCPT = 'YES'</span>
+
+<span class="cmt">"If uploaded doc type IN variant ZECM_DTYP_TAXINV</span>
+<span class="cmt">"AND category X_FI_SJT_TAXFLAG = 'YES'</span>
+<span class="cmt">"→ Set ZCROSSECMTnn5-WSC_IND_TAXINV = 'YES'</span>
+
+<span class="cmt">"If uploaded doc type IN variant ZECM_DTYP_WHT</span>
+<span class="cmt">"AND category X_FI_SJT_WHTFLAG = 'YES'</span>
+<span class="cmt">"→ Set ZCROSSECMTnn5-WSC_IND_WHT = 'YES'</span></code></pre>`
+  },
+
+  {
+    id:'customtable',
+    keys:['custom table','zcrossecmtnn5','zecm table','wsc_ind','ind_rcpt','ind_taxinv','ind_wht','logging table','table structure'],
+    html:`
+<h3>Custom Table — ZCROSSECMTnn5</h3>
+<p>This table logs supporting document indicator flags for Payment and AR Incoming documents uploaded to xECM.</p>
+<table>
+  <tr><th>#</th><th>Field</th><th>Type</th><th>Length</th><th>Description</th></tr>
+  <tr><td>1</td><td><code>WSC_NAME</code></td><td>CHAR</td><td>65</td><td>Workspace Name</td></tr>
+  <tr><td>2</td><td><code>WSC_GROUP</code></td><td>CHAR</td><td>10</td><td>Workspace Group</td></tr>
+  <tr><td>3</td><td><code>WSC_OBJID</code></td><td>CHAR</td><td>18</td><td>Workspace Object ID (CoCd+DocNo+FYear)</td></tr>
+  <tr><td>4</td><td><code>WSC_NODEID</code></td><td>CHAR</td><td>10</td><td>Workspace Node ID</td></tr>
+  <tr><td>5</td><td><code>WSC_IND_RCPT</code></td><td>CHAR</td><td>3</td><td>Indicator: Subjected to Receipt (<code>YES</code>)</td></tr>
+  <tr><td>6</td><td><code>WSC_IND_TAXINV</code></td><td>CHAR</td><td>3</td><td>Indicator: Subjected to Tax Invoice (<code>YES</code>)</td></tr>
+  <tr><td>7</td><td><code>WSC_IND_WHT</code></td><td>CHAR</td><td>3</td><td>Indicator: Subjected to WHT Certificate (<code>YES</code>)</td></tr>
+</table>
+<div class="info">💡 This table is populated by Method 2E (Upload) when uploading to AP Payment / AR Incoming workspaces and the relevant category flags are set.</div>
+<div class="warn">⚠️ The actual table name suffix (nn5) will be confirmed during technical design. Check with the technical lead for the final table name.</div>`
+  },
+
+  {
+    id:'related_wricefs',
+    keys:['related wricef','other wricef','workspace trigger wricef','xecm-e-060','xecm-e-059','xecm-e-002','xecm-e-095','which wricef triggers','wricef list','related enhancement'],
+    html:`
+<h3>Related WRICEFs — Workspace Triggers</h3>
+<p>XECM-E-058 provides the <em>common methods</em>. Workspace creation for each business object type is handled by dedicated WRICEFs:</p>
+<table>
+  <tr><th>WRICEF</th><th>Business Object / Workspace</th></tr>
+  <tr><td><code>XECM-E-002</code></td><td>Treasury Contract workspace</td></tr>
+  <tr><td><code>XECM-E-059</code></td><td>MDG — Business Partner workspace</td></tr>
+  <tr><td><code>XECM-E-060</code></td><td>Accounting Document workspace (BKPF)</td></tr>
+  <tr><td><code>XECM-E-063</code></td><td>Bank Account Request workspace</td></tr>
+  <tr><td><code>XECM-E-065</code></td><td>Fund Transfer / Cash Trade Request workspace</td></tr>
+  <tr><td><code>xECM-E-095</code></td><td>Sales Order workspace</td></tr>
+</table>
+<div class="info">💡 <code>TRIGGER_WORKSPACE</code> in this class delegates to the FM from the respective workspace WRICEF based on the business object type passed.</div>
+<h4>Example: BKPF → XECM-E-060</h4>
+<pre><code><span class="cmt">"When iv_object_type = 'BKPF',</span>
+<span class="cmt">"TRIGGER_WORKSPACE calls the FM from XECM-E-060 (ZFNAXECMM_MAIN)</span></code></pre>
+<h4>Business Processes Covered</h4>
+<ul>
+  <li>AP: Invoice Processing, Outgoing Payments, Supplier Downpayments</li>
+  <li>AR: Invoice Processing, Incoming Payments</li>
+  <li>General Accounting / Journal Processing</li>
+  <li>Travel &amp; Expense Management</li>
+  <li>Joint Venture Accounting, Corporate Finance</li>
+  <li>Financial Risk Management (FX, Hedge, Interest Rate)</li>
+  <li>Bank Statement Processing</li>
+  <li>SD: Billing, Return Orders, Debit/Credit Memo</li>
+</ul>`
+  },
+
+  {
+    id:'part3',
+    keys:['part 3','wrapper program','manual trigger','executable program','se38','alv','manual workspace','re-trigger','retrigger'],
+    html:`
+<h3>PART 3 — Manual Workspace Trigger Program</h3>
+<p>A standalone ABAP executable program with a selection screen allows technical team to manually trigger xECM workspaces (e.g., for recovery after technical failures).</p>
+<h4>Selection Screen Fields</h4>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Mandatory</th><th>Description</th></tr>
+  <tr><td>Business Object</td><td>CHAR (alphanumeric)</td><td>Yes</td><td>SAP Business Object Type (e.g., BKPF)</td></tr>
+  <tr><td>Object ID</td><td>CHAR (alphanumeric)</td><td>Yes</td><td>SAP Object ID for the specific business workspace</td></tr>
+</table>
+<h4>Processing Flow</h4>
+<div class="step"><div class="snum">1</div><div>Instantiate <code>ZCL_OPTEM_XECM_SERVICE</code> (authenticate)</div></div>
+<div class="step"><div class="snum">2</div><div>For each Object ID on the selection screen, call <code>TRIGGER_WORKSPACE</code> (Method 2C)</div></div>
+<div class="step"><div class="snum">3</div><div>Display processing log in ALV format on screen (success/error per object)</div></div>
+<div class="info">🔒 <strong>Access:</strong> Executed by technical team via <code>SE38</code> following <strong>GRC-EAM (Emergency Access Management)</strong> process. Not for end-user direct access.</div>
+<div class="warn">⚠️ This program also supports a <strong>test run mode</strong> (simulates processing without actual execution) and an <strong>actual run mode</strong>.</div>`
+  },
+
+  {
+    id:'fd_overview',
+    keys:['functional design','fd document','fd','functional spec','specification','document control','author','henry','version'],
+    html:`
+<h3>FD Document Information</h3>
+<table>
+  <tr><th>Field</th><th>Value</th></tr>
+  <tr><td>Document Title</td><td>XECM-E-058 Common class for document upload function to ADA + XECM</td></tr>
+  <tr><td>Version</td><td>V0.1 (26/11/2025)</td></tr>
+  <tr><td>Author / Prepared by</td><td>Henry Widjojo (Integration Lead)</td></tr>
+  <tr><td>Validated by</td><td>Henry Widjojo</td></tr>
+  <tr><td>Reviewed by</td><td>Preeda Hongpimolmas (PTTEP BRM–FNA), Kanokon Israngura Na Ayutthaya, Mei Mei Chan, Monnapa Tangtanaporn</td></tr>
+  <tr><td>Endorsed by</td><td>Kanoknatapat Chaowalit</td></tr>
+  <tr><td>Project</td><td>PTTEP SHANA (SAP S/4HANA Implementation)</td></tr>
+  <tr><td>Complexity</td><td>Medium</td></tr>
+  <tr><td>Priority</td><td>P1</td></tr>
+  <tr><td>SI Functional Lead</td><td>Henry Widjojo</td></tr>
+  <tr><td>Business Owner</td><td>Kanoknatapat Chaowalit</td></tr>
+</table>
+<h4>Scope — 3 Parts</h4>
+<ul>
+  <li><strong>Part 1:</strong> ADA (OpenText ArchiveLink) — 4 methods (1A–1D)</li>
+  <li><strong>Part 2:</strong> xECM (OpenText Content Server) — 7 methods (2A–2G)</li>
+  <li><strong>Part 3:</strong> Wrapper executable program for manual xECM workspace trigger</li>
+</ul>`
+  },
+
+  {
+    id:'meeting',
+    keys:['meeting','schedule','contact','discuss','talk','consult','appointment','call','reach out','speak','help','more info'],
+    html:`
+<h3>Want to discuss this further?</h3>
+<p>I'm Thanat — the technical consultant responsible for XECM-E-058 on the SHANA project. Happy to jump on a call or meeting to walk through the integration in detail.</p>
+<div class="info">
+  📩 <strong>Email:</strong> thanat.hongpanarak@accenture.com<br>
+  🔁 <strong>CC:</strong> zthanath@pttep.com<br>
+  🕐 <strong>Timezone:</strong> Bangkok (ICT, UTC+7)<br>
+  💼 <strong>Project:</strong> SHANA · PTTEP S/4HANA
+</div>
+<button class="mtg-inline" onclick="openModal()">📅 Schedule a Meeting</button>`
+  }
+];
+
+/* ════════════════════════════════════════════
+   CHAT ENGINE
+   ════════════════════════════════════════════ */
+let busy = false;
+
+function score(text, entry){
+  const t = text.toLowerCase();
+  let s = 0;
+  for(const k of entry.keys) if(t.includes(k)) s += k.length;
+  return s;
+}
+
+function findResponse(input){
+  let best = null, top = 0;
+  for(const e of KB){
+    const s = score(input, e);
+    if(s > top){ top = s; best = e; }
+  }
+  if(top >= 3) return best;
+  return {
+    id:'fallback',
+    html:`<p>I can help with <strong>XECM-E-058</strong>. Try asking about:</p>
+<ul>
+  <li>📋 <strong>Overview</strong> — What is XECM-E-058?</li>
+  <li>🔧 <strong>Integration Steps</strong> — The 3-step pattern</li>
+  <li>📤 <strong>Upload</strong> — UPLOAD_DOCUMENT_XSTRING usage</li>
+  <li>🔍 <strong>Fetch Node</strong> — FETCH_NODE_ID & node structure</li>
+  <li>🔑 <strong>ID Format</strong> — BKPF / ZPAYRQ / BUS2042 keys</li>
+  <li>📚 <strong>All Methods</strong> — Complete method reference</li>
+  <li>💻 <strong>Code Example</strong> — Full working ABAP code</li>
+  <li>📅 <strong>Schedule Meeting</strong> — Talk to Thanat directly</li>
+</ul>
+<p style="color:var(--text-muted);font-size:12px;margin-top:6px">Or click the quick-action buttons below.</p>`
+  };
+}
+
+function addCopyButtons(container){
+  container.querySelectorAll('pre').forEach(pre => {
+    /* avoid double-wrapping */
+    if(pre.parentElement && pre.parentElement.classList.contains('pre-wrap')) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'pre-wrap';
+    pre.parentNode.insertBefore(wrap, pre);
+    wrap.appendChild(pre);
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = '📋 Copy';
+    btn.addEventListener('click', () => {
+      const code = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        btn.textContent = '✅ Copied!';
+        btn.classList.add('done');
+        setTimeout(() => { btn.textContent = '📋 Copy'; btn.classList.remove('done'); }, 2000);
+      }).catch(() => {
+        btn.textContent = '❌ Failed';
+        setTimeout(() => { btn.textContent = '📋 Copy'; }, 2000);
+      });
+    });
+    wrap.appendChild(btn);
+  });
+}
+
+function addMsg(html, user=false){
+  const chat = document.getElementById('chat');
+  const d = document.createElement('div');
+  d.className = 'msg' + (user?' user':'');
+  const av = document.createElement('div');
+  av.className = 'msg-av ' + (user?'av-user':'av-bot');
+  av.textContent = user ? 'You' : 'TH';
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  b.innerHTML = html;
+  if(!user) addCopyButtons(b);
+  d.appendChild(av); d.appendChild(b);
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function showTyping(){
+  const chat = document.getElementById('chat');
+  const d = document.createElement('div');
+  d.className = 'typing'; d.id = 'typing';
+  d.innerHTML = '<div class="msg-av av-bot">TH</div><div class="typing-dots"><span></span><span></span><span></span></div>';
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+}
+function hideTyping(){ const t=document.getElementById('typing'); if(t) t.remove(); }
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function send(){
+  const inp = document.getElementById('inp');
+  const t = inp.value.trim();
+  if(!t || busy) return;
+  addMsg(esc(t), true);
+  inp.value = ''; inp.style.height = 'auto';
+  busy = true;
+  showTyping();
+  setTimeout(()=>{
+    hideTyping();
+    const r = findResponse(t);
+    if(r.id === 'meeting') openModal();
+    addMsg(r.html);
+    busy = false;
+  }, 700 + Math.random()*400);
+}
+
+function ask(t){
+  if(busy) return;
+  const inp = document.getElementById('inp');
+  inp.value = t;
+  send();
+}
+
+function onKey(e){
+  if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); }
+}
+
+function resize(el){
+  el.style.height='auto';
+  el.style.height = Math.min(el.scrollHeight,110)+'px';
+}
+
+/* ════════════════════════════════════════════
+   MEETING MODAL
+   ════════════════════════════════════════════ */
+function openModal(){ document.getElementById('overlay').classList.add('on'); }
+function closeModal(){ document.getElementById('overlay').classList.remove('on'); }
+function overlayClick(e){ if(e.target===document.getElementById('overlay')) closeModal(); }
+
+function sendMeeting(){
+  const topic   = document.getElementById('m-topic').value.trim() || 'XECM-E-058 Technical Discussion';
+  const notes   = document.getElementById('m-notes').value.trim();
+  const dateVal = document.getElementById('m-date').value;
+  const timeVal = document.getElementById('m-time').value;
+
+  /* Format chosen slot */
+  const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const MONS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let slotText = 'TBD — please suggest a convenient slot (weekdays 10:00–17:00 ICT)';
+  if(dateVal){
+    const d = new Date(dateVal + 'T12:00:00');
+    const dayLabel = `${DAYS[d.getDay()]} ${d.getDate()} ${MONS[d.getMonth()]} ${d.getFullYear()}`;
+    slotText = timeVal
+      ? `${dayLabel} ${timeVal}–${String(parseInt(timeVal)+1).padStart(2,'0')}:00 ICT`
+      : `${dayLabel} (time TBD, available 10:00–17:00 ICT)`;
+  }
+
+  const subj = `Meeting Request: ${topic}`;
+  const body =
+`Hi Thanat,
+
+Requesting a 1-hour meeting on: ${topic}
+
+Date/Time : ${slotText}
+${notes ? '\nNotes:\n' + notes + '\n' : ''}
+Please confirm or suggest an alternative time.
+Also, kindly create a Microsoft Teams meeting link and share it in your reply.
+
+Thanks`;
+
+  const link = `mailto:thanat.hongpanarak@accenture.com?cc=zthanath%40pttep.com`
+    + `&subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+
+  window.location.href = link;
+  closeModal();
+
+  addMsg(`<p>✅ Outlook opened with your meeting request for <strong>${slotText}</strong>.</p>
+<p>📩 <strong>To:</strong> <code>thanat.hongpanarak@accenture.com</code> &nbsp;·&nbsp; <strong>CC:</strong> <code>zthanath@pttep.com</code></p>
+<p>💬 Please <strong>create a Microsoft Teams meeting</strong> link manually and include it in your email or reply.</p>`);
+}
+
+/* ════════════════════════════════════════════
+   INIT
+   ════════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', ()=>{
+  setTimeout(()=>{
+    addMsg(`<h3>👋 Hello! I'm Thanat's XECM-E-058 Assistant</h3>
+<p>I can answer technical questions about <strong>XECM-E-058</strong> — the common class for document management integration on the <strong>SHANA project (PTTEP S/4HANA)</strong>.</p>
+<p>This WRICEF covers <strong>3 parts</strong>:</p>
+<ul>
+  <li>🗄 <strong>Part 1 — OpenText ADA</strong>: Upload, Archive Link update, fetch properties &amp; URL</li>
+  <li>📁 <strong>Part 2 — OpenText xECM</strong>: Auth, Fetch Node, Trigger Workspace, Upload, Download, Search, Update Category</li>
+  <li>⚡ <strong>Part 3 — Manual Trigger Program</strong>: Executable program (SE38/GRC-EAM) with ALV output</li>
+</ul>
+<p>Use the <strong>quick action buttons</strong> below or type your question. You can also <strong>📅 schedule a meeting</strong> with me for a deeper discussion.</p>`);
+  }, 300);
+});
+</script>
+</body>
+</html>
